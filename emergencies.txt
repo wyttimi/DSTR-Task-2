@@ -1,0 +1,30 @@
+Ali Bin Ahmad
+Heart Attack
+10
+Siti Nur Aisyah
+Severe Allergic Reaction
+9
+John Tan
+Car Accident Trauma
+8
+Lim Wei Jie
+Stroke Symptoms
+10
+Amina Bakar
+Severe Asthma Attack
+9
+Raj Kumar
+Internal Bleeding
+10
+Chong Mei Lin
+High-Risk Pregnancy Complication
+8
+Sarah Lee
+Seizure
+9
+Adam Hafiz
+Severe Dehydration
+7
+Nurul Izzah
+Chest Pain
+8

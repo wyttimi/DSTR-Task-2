@@ -1,0 +1,30 @@
+P001
+Ali Bin Ahmad
+Flu
+P002
+Siti Nur Aisyah
+Checkup
+P003
+John Tan
+Fractured Arm
+P004
+Lim Wei Jie
+High Fever
+P005
+Amina Bakar
+Migraine
+P006
+Raj Kumar
+Diabetes Follow-up
+P007
+Chong Mei Lin
+Asthma Attack
+P008
+Sarah Lee
+Routine Blood Test
+P009
+Adam Hafiz
+Food Poisoning
+P010
+Nurul Izzah
+Prenatal Checkup

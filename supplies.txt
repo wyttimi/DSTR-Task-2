@@ -1,0 +1,33 @@
+Surgical Masks
+100
+MASK-BATCH-001
+Surgical Masks
+120
+MASK-BATCH-002
+Surgical Masks
+150
+MASK-BATCH-003
+Latex Gloves
+200
+GLV-BATCH-010
+Latex Gloves
+180
+GLV-BATCH-011
+IV Drip Sets
+90
+IV-BATCH-100
+IV Drip Sets
+95
+IV-BATCH-101
+Paracetamol Tablets
+250
+PARA-BATCH-A1
+Paracetamol Tablets
+270
+PARA-BATCH-A2
+Hand Sanitizer (500ml)
+80
+SAN-BATCH-55
+Hand Sanitizer (500ml)
+100
+SAN-BATCH-56
