@@ -4,9 +4,6 @@ MASK-BATCH-001
 Surgical Masks
 120
 MASK-BATCH-002
-Surgical Masks
-150
-MASK-BATCH-003
 Latex Gloves
 200
 GLV-BATCH-010

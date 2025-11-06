@@ -5,23 +5,51 @@
 
 #define SUPPLY_FILE "supplies.txt"
 
-// ========== ROLE 2: MEDICAL SUPPLY MANAGER (STACK) ==========
+// ==========================================================================
+// ROLE 2: MEDICAL SUPPLY MANAGER (STACK)
+// --------------------------------------------------------------------------
+// This module manages medical supplies using a LIFO (Last-In-First-Out)
+// STACK implemented with a fixed-size array.
+//
+// Data structure choice:
+//   - We use an array-based stack (top index).
+//   - This gives O(1) push (add supply) and pop (use supply).
+//   - Conceptually, each record represents a "batch" of a certain supply type.
+//   - We also allow choosing a supply type, then using the most recently
+//     added batch of that type (searching from top down).
+// ==========================================================================
 
 struct Supply {
-    char type[30];
-    int  quantity;
-    char batch[20];
+    char type[30];   // Name of supply type (e.g. "Surgical Masks")
+    int  quantity;   // Quantity in this batch (must be >= 1)
+    char batch[20];  // Batch identifier (e.g. "MASK-BATCH-001")
 };
 
 struct SupplyStack {
+    // Fixed-size array to store supply batches
     Supply data[MAX_SUPPLIES];
+
+    // top index: -1 means the stack is empty.
+    // When we push(), we increment top and store at data[top].
+    // When we pop(), we read data[top] and decrement top.
     int top = -1; // -1 means empty
 
+    // Check if the stack is full
     bool isFull()  const { return top == MAX_SUPPLIES - 1; }
+
+    // Check if the stack is empty
     bool isEmpty() const { return top == -1; }
 
+    // Reset stack to empty state
     void clear() { top = -1; }
 
+    // ----------------------------------------------------------------------
+    // push()
+    // ----------------------------------------------------------------------
+    // Purpose : Add a new supply batch to the top of the stack.
+    // Input   : s - Supply struct to be pushed.
+    // Return  : true if successful, false if the stack is full.
+    // ----------------------------------------------------------------------
     bool push(const Supply& s) {
         if (isFull()) return false;
         top++;
@@ -29,6 +57,15 @@ struct SupplyStack {
         return true;
     }
 
+    // ----------------------------------------------------------------------
+    // pop()
+    // ----------------------------------------------------------------------
+    // Purpose : Remove the last added (top) supply batch from the stack.
+    // Output  : out - Supply that was removed.
+    // Return  : true if successful, false if the stack is empty.
+    // NOTE    : This basic pop is not used for "use by type" but is kept
+    //           for completeness of the stack implementation.
+    // ----------------------------------------------------------------------
     bool pop(Supply& out) {
         if (isEmpty()) return false;
         out = data[top];
@@ -36,6 +73,12 @@ struct SupplyStack {
         return true;
     }
 
+    // ----------------------------------------------------------------------
+    // print()
+    // ----------------------------------------------------------------------
+    // Purpose : Display all supply batches currently stored in the stack,
+    //           starting from the top (most recently added).
+    // ----------------------------------------------------------------------
     void print() const {
         if (isEmpty()) {
             cout << "No supplies available.\n";
@@ -52,8 +95,16 @@ struct SupplyStack {
         }
     }
 
-    // ---- save / load to text file ----
-    // Format: 3 lines per record → type, quantity, batch
+    // ----------------------------------------------------------------------
+    // saveToFile()
+    // ----------------------------------------------------------------------
+    // Purpose : Save the contents of the supply stack to a text file.
+    // Format  : For each supply batch, 3 lines are written:
+    //           line 1 -> type
+    //           line 2 -> quantity
+    //           line 3 -> batch
+    // Note    : Batches are written from index 0 up to top (bottom to top).
+    // ----------------------------------------------------------------------
     void saveToFile(const char* filename) const {
         ofstream out(filename);
         if (!out) {
@@ -68,6 +119,16 @@ struct SupplyStack {
         }
     }
 
+    // ----------------------------------------------------------------------
+    // loadFromFile()
+    // ----------------------------------------------------------------------
+    // Purpose : Load supply batches from a text file into the stack.
+    // Behavior:
+    //   - If the file does not exist, the stack starts empty.
+    //   - If the file exists, it reads records until EOF or the stack is full.
+    // Format  : Must match saveToFile() format:
+    //           type, quantity, batch (3 lines per supply).
+    // ----------------------------------------------------------------------
     void loadFromFile(const char* filename) {
         ifstream in(filename);
         if (!in) {
@@ -101,10 +162,26 @@ struct SupplyStack {
     }
 };
 
+// --------------------------------------------------------------------------
+// Global supply stack instance
+// --------------------------------------------------------------------------
+// As with patients, we use an inline global variable here (C++17 feature)
+// so that all functions in this header operate on the same stack instance.
+// --------------------------------------------------------------------------
 inline SupplyStack gSupplies;
 
-// ------- UI + menu for Role 2 -------
+// ====================== UI FUNCTIONS FOR ROLE 2 ============================
 
+// --------------------------------------------------------------------------
+// ui_add_supply()
+// --------------------------------------------------------------------------
+// Purpose : Interactively add a new supply batch to the stack.
+// Steps   :
+//   1) Ask for supply type (text).
+//   2) Ask for quantity with validation (must be a number >= 1).
+//   3) Ask for batch ID.
+//   4) Push the record onto the stack and save to SUPPLY_FILE.
+// --------------------------------------------------------------------------
 inline void ui_add_supply(){
     if(gSupplies.isFull()){
         cout<<"Supply store is full.\n";
@@ -137,13 +214,27 @@ inline void ui_add_supply(){
 
     if (gSupplies.push(s)) {
         cout << "Recorded (stack top).\n";
-        gSupplies.saveToFile(SUPPLY_FILE);      // <-- now it saves when adding
+        gSupplies.saveToFile(SUPPLY_FILE);    // auto-save after adding
     } else {
         cout << "Failed to add supply.\n";
     }
 }
 
 
+// --------------------------------------------------------------------------
+// ui_use_supply_by_type()
+// --------------------------------------------------------------------------
+// Purpose : Let the user choose a supply type and then use the most recently
+//           added batch of that type.
+//
+// Logic   :
+//   1) Build a list of UNIQUE supply types currently in the stack.
+//   2) Display them as a numbered menu.
+//   3) Ask the user to choose one.
+//   4) Search from TOP downwards to find the last-added batch of that type.
+//   5) Remove that batch from the stack (shift elements to close the gap).
+//   6) Display the used batch and save the updated stack to SUPPLY_FILE.
+// --------------------------------------------------------------------------
 inline void ui_use_supply_by_type() {
     if (gSupplies.isEmpty()) {
         cout << "No supplies to use.\n";
@@ -229,9 +320,21 @@ inline void ui_use_supply_by_type() {
          << " x" << used.quantity
          << " (Batch: " << used.batch << ")\n";
 
+    // Save the updated stack to file after using a batch
     gSupplies.saveToFile(SUPPLY_FILE);
 }
 
+// --------------------------------------------------------------------------
+// menu_supplies()
+// --------------------------------------------------------------------------
+// Purpose : Display the sub-menu for the Medical Supply Manager role and
+//           allow the user to perform operations on the supply stack.
+// Options :
+//   1) Add Supply Stock (push)
+//   2) Use Supply by Type (uses last-added batch of chosen type)
+//   3) View Current Supplies
+//   0) Back (return to main menu)
+// --------------------------------------------------------------------------
 inline void menu_supplies() {
     while (true) {
         line('=');
@@ -258,6 +361,12 @@ inline void menu_supplies() {
     }
 }
 
+// --------------------------------------------------------------------------
+// load_supplies_from_file()
+// --------------------------------------------------------------------------
+// Convenience wrapper for main.cpp to load supplies into the global stack
+// from SUPPLY_FILE at program startup.
+// --------------------------------------------------------------------------
 inline void load_supplies_from_file() {
     gSupplies.loadFromFile(SUPPLY_FILE);
 }
