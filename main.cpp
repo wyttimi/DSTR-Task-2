@@ -77,7 +77,7 @@ int main() {
         // Otherwise, call the corresponding role menu.
         // -------------------------------------------------------------------
         if (ch == 0) {
-            cout << "Goodbye!\n";
+            cout << "Thank you and goodbye!\n";
             break;   // exit the while loop and end the program
         }
 

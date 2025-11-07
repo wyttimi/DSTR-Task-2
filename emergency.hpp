@@ -90,14 +90,24 @@ struct EmergencyMaxHeap {
     // ----------------------------------------------------------------------
     // pop()
     // ----------------------------------------------------------------------
-    // Purpose : Remove the most critical emergency case from the heap.
-    // Steps   :
-    //   1) Replace root (index 1) with the last element (data[sz]).
-    //   2) Decrease sz.
-    //   3) "Sift down" (heapify down) to restore max-heap property.
-    // Behavior:
-    //   - If the heap is empty, do nothing.
+    // Purpose :
+    //   Remove the most critical emergency case (the top of the heap).
+    //
+    // Simple explanation :
+    //   - The top of the heap always has the case with the highest priority.
+    //   - When we remove it, we take the last case in the heap and move it
+    //     to the top (to fill the empty spot).
+    //   - Then we compare it with its children and keep swapping it down
+    //     until the heap order is correct again (every parent has higher
+    //     priority than its children).
+    //
+    // What it does in steps :
+    //   1) Move the last element to the top.
+    //   2) Reduce the total number of cases by 1.
+    //   3) Reorder (heapify down) to fix the heap order.
+    //   4) If there are no cases, it does nothing.
     // ----------------------------------------------------------------------
+
     void pop() {
         if (isEmpty()) return;
         data[1] = data[sz];
