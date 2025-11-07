@@ -120,30 +120,47 @@ struct EmergencyMaxHeap {
         }
     }
 
-    // ----------------------------------------------------------------------
+        // ----------------------------------------------------------------------
     // print()
     // ----------------------------------------------------------------------
-    // Purpose : Display all emergency cases currently in the heap array.
-    // Note    :
-    //   - The internal order is by heap structure, NOT by sorted order.
-    //   - However, the root (index 1) is always the highest-priority case.
+    // Purpose : Display all emergency cases sorted by priority, from
+    //           highest to lowest, WITHOUT modifying the real heap.
+    // Method  :
+    //   - Make a temporary copy of the heap.
+    //   - Repeatedly take temp.top() and temp.pop().
+    //   - This simulates removing the max each time, showing true priority
+    //     order, while the original heap remains unchanged.
     // ----------------------------------------------------------------------
     void print() const {
         if (isEmpty()) {
             cout << "No emergency cases pending.\n";
             return;
         }
+
         cout << left << setw(22) << "Patient"
              << setw(18) << "Emergency"
              << "Priority" << "\n";
         line();
+
+        // Make a copy of the current heap
+        EmergencyMaxHeap temp;
+        temp.sz = sz;
         for (int i = 1; i <= sz; ++i) {
-            cout << left << setw(22) << data[i].patient
-                 << setw(18) << data[i].type
-                 << data[i].priority << "\n";
+            temp.data[i] = data[i];
         }
-        cout << "(Highest priority case is always processed first.)\n";
+
+        // Repeatedly extract the highest-priority case from the copy
+        while (!temp.isEmpty()) {
+            EmergencyCase e = temp.top();
+            cout << left << setw(22) << e.patient
+                 << setw(18) << e.type
+                 << e.priority << "\n";
+            temp.pop();
+        }
+
+        cout << "(Shown from highest to lowest priority.)\n";
     }
+
 
     // ----------------------------------------------------------------------
     // saveToFile()
