@@ -21,10 +21,6 @@
 #include "ambulance.hpp"  // Ambulance circular queue + load_ambulances_from_file()
 
 int main() {
-    // Improve I/O performance (optional, but common in C++)
-    ios::sync_with_stdio(false);
-    cin.tie(nullptr);   // Disable automatic flush before reading from cin
-
     // -----------------------------------------------------------------------
     // STEP 1: Load existing data from text files (if the files exist).
     // Each role has its own text file and its own load_..._from_file() function:

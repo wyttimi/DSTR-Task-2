@@ -53,14 +53,21 @@ struct EmergencyMaxHeap {
     // ----------------------------------------------------------------------
     // push()
     // ----------------------------------------------------------------------
-    // Purpose : Insert a new emergency case into the max-heap.
-    // Steps   :
-    //   1) Add the new element at the end (data[++sz]).
-    //   2) "Sift up" (heapify up) while its priority is greater than
-    //      its parent's priority.
-    // Behavior:
-    //   - If the heap is full, print an error message and do nothing.
+    // Purpose :
+    //   Add a new emergency case into the heap.
+    //
+    // Simple explanation :
+    //   - When a new emergency is logged, it is placed at the end of the heap.
+    //   - Then we compare its priority with its parent's priority.
+    //   - If the new case is more critical (higher priority), we swap it upward
+    //     until the heap order is correct again (the most critical case stays on top).
+    //
+    // What it does in steps :
+    //   1) Put the new case at the end of the heap.
+    //   2) Keep moving it up while its priority is higher than its parent's.
+    //   3) If the heap is already full, show an error message and do nothing.
     // ----------------------------------------------------------------------
+
     void push(const EmergencyCase& e) {
         if (isFull()) {
             cout << "Emergency queue is full.\n";
@@ -130,7 +137,7 @@ struct EmergencyMaxHeap {
         }
     }
 
-        // ----------------------------------------------------------------------
+    // ----------------------------------------------------------------------
     // print()
     // ----------------------------------------------------------------------
     // Purpose : Display all emergency cases sorted by priority, from
