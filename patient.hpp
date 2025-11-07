@@ -240,7 +240,7 @@ inline void ui_discharge_patient() {
 inline void menu_patients() {
     while (true) {
         line('=');
-        cout << "PATIENT ADMISSION CLERK (Queue)\n";
+        cout << "PATIENT ADMISSION CLERK (FIFO)\n";
         line('=');
         cout << "1) Admit Patient\n";
         cout << "2) Discharge Patient (earliest)\n";

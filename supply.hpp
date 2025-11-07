@@ -14,9 +14,8 @@
 // Data structure choice:
 //   - We use an array-based stack (top index).
 //   - This gives O(1) push (add supply) and pop (use supply).
-//   - Conceptually, each record represents a "batch" of a certain supply type.
-//   - We also allow choosing a supply type, then using the most recently
-//     added batch of that type (searching from top down).
+//   - Each element represents one batch of a particular supply type.
+//   - "Use Last Added Supply" simply pops the most recently added batch.
 // ==========================================================================
 
 struct Supply {
@@ -30,8 +29,6 @@ struct SupplyStack {
     Supply data[MAX_SUPPLIES];
 
     // top index: -1 means the stack is empty.
-    // When we push(), we increment top and store at data[top].
-    // When we pop(), we read data[top] and decrement top.
     int top = -1; // -1 means empty
 
     // Check if the stack is full
@@ -63,8 +60,6 @@ struct SupplyStack {
     // Purpose : Remove the last added (top) supply batch from the stack.
     // Output  : out - Supply that was removed.
     // Return  : true if successful, false if the stack is empty.
-    // NOTE    : This basic pop is not used for "use by type" but is kept
-    //           for completeness of the stack implementation.
     // ----------------------------------------------------------------------
     bool pop(Supply& out) {
         if (isEmpty()) return false;
@@ -103,7 +98,6 @@ struct SupplyStack {
     //           line 1 -> type
     //           line 2 -> quantity
     //           line 3 -> batch
-    // Note    : Batches are written from index 0 up to top (bottom to top).
     // ----------------------------------------------------------------------
     void saveToFile(const char* filename) const {
         ofstream out(filename);
@@ -126,8 +120,7 @@ struct SupplyStack {
     // Behavior:
     //   - If the file does not exist, the stack starts empty.
     //   - If the file exists, it reads records until EOF or the stack is full.
-    // Format  : Must match saveToFile() format:
-    //           type, quantity, batch (3 lines per supply).
+    // Format  : type, quantity, batch (3 lines per supply).
     // ----------------------------------------------------------------------
     void loadFromFile(const char* filename) {
         ifstream in(filename);
@@ -162,12 +155,7 @@ struct SupplyStack {
     }
 };
 
-// --------------------------------------------------------------------------
-// Global supply stack instance
-// --------------------------------------------------------------------------
-// As with patients, we use an inline global variable here (C++17 feature)
-// so that all functions in this header operate on the same stack instance.
-// --------------------------------------------------------------------------
+// Global stack instance (C++17 inline variable)
 inline SupplyStack gSupplies;
 
 // ====================== UI FUNCTIONS FOR ROLE 2 ============================
@@ -220,107 +208,32 @@ inline void ui_add_supply(){
     }
 }
 
-
 // --------------------------------------------------------------------------
-// ui_use_supply_by_type()
+// ui_use_last_supply()
 // --------------------------------------------------------------------------
-// Purpose : Let the user choose a supply type and then use the most recently
-//           added batch of that type.
-//
-// Logic   :
-//   1) Build a list of UNIQUE supply types currently in the stack.
-//   2) Display them as a numbered menu.
-//   3) Ask the user to choose one.
-//   4) Search from TOP downwards to find the last-added batch of that type.
-//   5) Remove that batch from the stack (shift elements to close the gap).
-//   6) Display the used batch and save the updated stack to SUPPLY_FILE.
+// Purpose : Use the last added (top) supply batch.
+// Steps   :
+//   1) Check if stack is empty.
+//   2) Pop the top element.
+//   3) Show what was used and save updated stack to SUPPLY_FILE.
 // --------------------------------------------------------------------------
-inline void ui_use_supply_by_type() {
+inline void ui_use_last_supply() {
     if (gSupplies.isEmpty()) {
         cout << "No supplies to use.\n";
         return;
     }
 
-    // 1) Build a list of unique supply types currently in the stack
-    char types[MAX_SUPPLIES][30];
-    int typeCount = 0;
-
-    for (int i = 0; i <= gSupplies.top; ++i) {
-        bool exists = false;
-        for (int j = 0; j < typeCount; ++j) {
-            if (strcmp(gSupplies.data[i].type, types[j]) == 0) {
-                exists = true;
-                break;
-            }
-        }
-        if (!exists) {
-            // add new type
-            strncpy(types[typeCount], gSupplies.data[i].type, 29);
-            types[typeCount][29] = '\0';
-            typeCount++;
-        }
-    }
-
-    if (typeCount == 0) {
-        cout << "No supplies available.\n";
+    Supply used{};
+    if (!gSupplies.pop(used)) {
+        cout << "Failed to use supply.\n";
         return;
     }
 
-    // 2) Show the list of available types
-    cout << "Available supply types:\n";
-    for (int i = 0; i < typeCount; ++i) {
-        cout << "  " << (i + 1) << ") " << types[i] << "\n";
-    }
+    cout << "Using last added supply batch:\n";
+    cout << "  Type : " << used.type << "\n";
+    cout << "  Qty  : " << used.quantity << "\n";
+    cout << "  Batch: " << used.batch << "\n";
 
-    // 3) Ask user which type they want to use
-    int choice;
-    while (true) {
-        cout << "Choose a type (1-" << typeCount << "): ";
-        if (!(cin >> choice)) {
-            cin.clear();
-            cin.ignore(numeric_limits<streamsize>::max(), '\n');
-            cout << "Invalid input. Please enter a number.\n";
-            continue;
-        }
-        cin.ignore(numeric_limits<streamsize>::max(), '\n');
-
-        if (choice < 1 || choice > typeCount) {
-            cout << "Choice out of range. Try again.\n";
-            continue;
-        }
-        break;
-    }
-
-    const char* wanted = types[choice - 1];
-
-    // 4) Find the last-added batch of that type (search from top down)
-    int index = -1;
-    for (int i = gSupplies.top; i >= 0; --i) {
-        if (strcmp(gSupplies.data[i].type, wanted) == 0) {
-            index = i;
-            break;
-        }
-    }
-
-    if (index == -1) {
-        // Very unlikely, but safe to handle
-        cout << "Unexpected error: type not found.\n";
-        return;
-    }
-
-    // 5) Remove that batch from the stack (cut from the middle)
-    Supply used = gSupplies.data[index];
-
-    for (int i = index; i < gSupplies.top; ++i) {
-        gSupplies.data[i] = gSupplies.data[i + 1];
-    }
-    gSupplies.top--;
-
-    cout << "Using supply: " << used.type
-         << " x" << used.quantity
-         << " (Batch: " << used.batch << ")\n";
-
-    // Save the updated stack to file after using a batch
     gSupplies.saveToFile(SUPPLY_FILE);
 }
 
@@ -328,10 +241,10 @@ inline void ui_use_supply_by_type() {
 // menu_supplies()
 // --------------------------------------------------------------------------
 // Purpose : Display the sub-menu for the Medical Supply Manager role and
-//           allow the user to perform operations on the supply stack.
+//           allow the user to operate on the supply stack.
 // Options :
 //   1) Add Supply Stock (push)
-//   2) Use Supply by Type (uses last-added batch of chosen type)
+//   2) Use 'Last Added' Supply (pop)
 //   3) View Current Supplies
 //   0) Back (return to main menu)
 // --------------------------------------------------------------------------
@@ -341,7 +254,7 @@ inline void menu_supplies() {
         cout << "MEDICAL SUPPLY MANAGER (Stack)\n";
         line('=');
         cout << "1) Add Supply Stock (push)\n";
-        cout << "2) Use Supply by Type (last batch of that type)\n";
+        cout << "2) Use 'Last Added' Supply (pop)\n";
         cout << "3) View Current Supplies\n";
         cout << "0) Back\n> ";
 
@@ -355,7 +268,7 @@ inline void menu_supplies() {
 
         if (ch == 0) break;
         else if (ch == 1) ui_add_supply();
-        else if (ch == 2) ui_use_supply_by_type();
+        else if (ch == 2) ui_use_last_supply();
         else if (ch == 3) gSupplies.print();
         else cout << "Invalid choice.\n";
     }

@@ -50,7 +50,7 @@ int main() {
         line('=');   // Print a line of '=' characters for nicer formatting
         cout << "HOSPITAL PATIENT CARE MANAGEMENT SYSTEM\n";
         line('=');
-        cout << "1) Patient Admission Clerk (Queue)\n";
+        cout << "1) Patient Admission Clerk (FIFO Queue)\n";
         cout << "2) Medical Supply Manager (Stack)\n";
         cout << "3) Emergency Dept Officer (Priority Queue)\n";
         cout << "4) Ambulance Dispatcher (Circular Queue)\n";
