@@ -12,7 +12,7 @@
 // implemented with a fixed-size array.
 //
 // Data structure choice:
-//   - We use an array-based circular queue (head, tail, count).
+//   - Array-based circular queue (head, tail, count).
 //   - This gives O(1) enqueue and dequeue operations.
 //   - It is suitable because ambulances are rotated in a round-robin fashion,
 //     so after the first ambulance serves, it goes to the back of the queue.
