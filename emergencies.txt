@@ -1,21 +1,18 @@
 Lim Wei Jie
 Stroke Symptoms
 10
-Siti Nur Aisyah
-Severe Allergic Reaction
-6
-Raj Kumar
-Internal Bleeding
-10
 Sarah Lee
 Seizure
-7
-Amina Bakar
-Severe Asthma Attack
 9
 John Tan
 Car Accident Trauma
-5
+8
 Chong Mei Lin
 High-Risk Pregnancy Complication
-8
+7
+Nurul Izzah
+Chest Pain
+6
+Adam Hafiz
+Severe Dehydration
+5
