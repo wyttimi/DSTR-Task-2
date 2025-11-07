@@ -56,7 +56,7 @@ struct EmergencyMaxHeap {
     // Purpose :
     //   Add a new emergency case into the heap.
     //
-    // Simple explanation :
+    // Explanation :
     //   - When a new emergency is logged, it is placed at the end of the heap.
     //   - Then we compare its priority with its parent's priority.
     //   - If the new case is more critical (higher priority), we swap it upward
@@ -66,6 +66,13 @@ struct EmergencyMaxHeap {
     //   1) Put the new case at the end of the heap.
     //   2) Keep moving it up while its priority is higher than its parent's.
     //   3) If the heap is already full, show an error message and do nothing.
+    
+    // Note:
+    // If two emergencies have the same priority value,
+    // they will NOT swap places because we use the '>' comparison instead of '>='.
+    // This means cases with equal priority keep their original insertion order.
+    // So, if two patients have the same urgency, the one entered first
+    // will be processed first (like real hospital queue behavior).
     // ----------------------------------------------------------------------
 
     void push(const EmergencyCase& e) {
