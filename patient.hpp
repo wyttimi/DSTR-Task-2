@@ -189,7 +189,7 @@ inline void ui_admit_patient() {
     }
     Patient p{};
 
-    cout << "Enter Patient ID (e.g., P0028): ";
+    cout << "Enter Patient ID (e.g., P028): ";
     safe_getline(p.id, 16);      // no numeric check anymore (text ID)
 
     cout << "Enter Patient Name: ";
